@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>binnance red packet code</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
+    .msg { margin: 5px 0; }
+    .msg span { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Binnance red packet code</h2>
+  <div id="messages"></div>
+  <input type="text" id="username" placeholder="Your name" />
+  <input type="text" id="messageInput" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAawx2muQ8ECQCnCRtSQ6fdRDj0YODYndc",
+      authDomain: "online-team-creator.firebaseapp.com",
+      databaseURL: "https://online-team-creator-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "online-team-creator",
+      storageBucket: "online-team-creator.appspot.com",
+      messagingSenderId: "194042712020",
+      appId: "1:194042712020:web:f9f113eba69a5668c49041",
+      measurementId: "G-E46C08T18C"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "chatroom");
+
+    const messagesDiv = document.getElementById("messages");
+
+    onChildAdded(messagesRef, (snapshot) => {
+      const msg = snapshot.val();
+      console.log("New message:", msg); // Debug
+      const el = document.createElement("div");
+      el.classList.add("msg");
+      el.innerHTML = `<span>${msg.user}:</span> ${msg.text}`;
+      messagesDiv.appendChild(el);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+
+    window.sendMessage = function () {
+      const user = document.getElementById("username").value || "Anonymous";
+      const text = document.getElementById("messageInput").value;
+      if (text.trim() !== "") {
+        push(messagesRef, { user, text });
+        document.getElementById("messageInput").value = "";
+      }
+    };
+  </script>
+</body>
+</html>
