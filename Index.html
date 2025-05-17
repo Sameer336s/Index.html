@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>binnance red packet code</title>
+  <title>f4x</title>
   <style>
     body { font-family: Arial; padding: 20px; }
     #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
@@ -12,11 +12,11 @@
   </style>
 </head>
 <body>
-  <h2>Binnance red packet code</h2>
+  <h2>f4x fan club</h2>
   <div id="messages"></div>
   <input type="text" id="username" placeholder="Your name" />
   <input type="text" id="messageInput" placeholder="Type your message..." />
-  <button onclick="sendMessage()">Send</button>
+  
 
   <!-- Firebase SDKs -->
   <script type="module">
@@ -60,5 +60,117 @@
       }
     };
   </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  
+    <title>Chat Room</title>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3828459493548375"
+            crossorigin="anonymous"></script>
+    <style>
+        /* Add your CSS styling here */
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chat-container { border: 1px solid #ccc; padding: 20px; margin-top: 20px; }
+        .message { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #eee; }
+        .user-info { font-weight: bold; color: #4285f4; }
+        .file-upload { margin-top: 10px; }
+        img, video { max-width: 300px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Google Login Button -->
+    <div id="google-login"></div>
+    
+    <!-- Chat Container -->
+    <div id="chat-container" style="display: none;">
+        <div id="messages"></div>
+        <input type="text" id="message-input" placeholder="Type your message">
+        <input type="file" id="file-input" multiple>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <script>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Google Login
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('chat-container').style.display = 'block';
+                loadMessages();
+            } else {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider);
+            }
+        });
+
+        // Send message function
+        async function sendMessage() {
+            const user = auth.currentUser;
+            const messageInput = document.getElementById('message-input');
+            const fileInput = document.getElementById('file-input');
+            
+            // Upload files
+            const fileUrls = [];
+            for (const file of fileInput.files) {
+                const storageRef = storage.ref(`chat_files/${Date.now()}_${file.name}`);
+                await storageRef.put(file);
+                const url = await storageRef.getDownloadURL();
+                fileUrls.push({ type: file.type.split('/')[0], url });
+            }
+
+            // Save message to Firestore
+            await db.collection('messages').add({
+                text: messageInput.value,
+                files: fileUrls,
+                userId: user.uid,
+                userName: user.displayName,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            messageInput.value = '';
+            fileInput.value = '';
+        }
+
+        // Load messages
+        function loadMessages() {
+            db.collection('messages')
+                .orderBy('timestamp')
+                .onSnapshot(snapshot => {
+                    const messagesDiv = document.getElementById('messages');
+                    messagesDiv.innerHTML = '';
+                    
+                    snapshot.forEach(doc => {
+                        const msg = doc.data();
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message';
+                        
+                        messageDiv.innerHTML = `
+                            <div class="user-info">${msg.userName}</div>
+                            <div>${msg.text}</div>
+                            ${msg.files ? msg.files.map(file => 
+                                file.type === 'image' ? 
+                                `<img src="${file.url}" alt="Image">` :
+                                `<video controls><source src="${file.url}"></video>`
+                            ).join('') : ''}
+                        `;
+                        
+                        messagesDiv.appendChild(messageDiv);
+                    });
+                });
+        }
+    </script>
 </body>
 </html>
