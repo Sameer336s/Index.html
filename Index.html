@@ -3,25 +3,158 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>f4x</title>
+  <title>sameer336s</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
-    .msg { margin: 5px 0; }
-    .msg span { font-weight: bold; }
+    body { 
+      font-family: Arial; 
+      padding: 20px; 
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      height: 100vh;
+      margin: 0;
+    }
+    
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    
+    #messages { 
+      border: 1px solid #ccc; 
+      padding: 10px; 
+      height: 490px; 
+      overflow-y: scroll; 
+      margin-bottom: 20px; 
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+    }
+    
+    .msg { 
+      margin: 10px 0; 
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 5px;
+    }
+    
+    .msg span { 
+      font-weight: bold;
+      color: #4285f4;
+    }
+    
+    h2 {
+      color: white;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    #input-area {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    #messageInput {
+      flex: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      min-width: 200px;
+    }
+    
+    button {
+      padding: 10px 15px;
+      background: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background: #3367d6;
+    }
+    
+    .file-container {
+      margin-top: 10px;
+      padding: 8px;
+      background: #f1f1f1;
+      border-radius: 5px;
+    }
+    
+    .file-link {
+      display: inline-block;
+      margin-right: 10px;
+      color: #4285f4;
+      text-decoration: none;
+    }
+    
+    .file-link:hover {
+      text-decoration: underline;
+    }
+    
+    .file-icon {
+      margin-right: 5px;
+    }
+    
+    .image-preview {
+      max-width: 300px;
+      max-height: 200px;
+      margin-top: 10px;
+      border-radius: 5px;
+      display: block;
+    }
+    
+    #fileInput {
+      display: none;
+    }
+    
+    .file-upload-btn {
+      background: #34a853;
+    }
+    
+    .file-upload-btn:hover {
+      background: #2d9248;
+    }
+    
+    #username {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
-  <h2>f4x fan club</h2>
+  <h2>f4x Chat</h2>
   <div id="messages"></div>
-  <input type="text" id="username" placeholder="Your name" />
-  <input type="text" id="messageInput" placeholder="Type your message..." />
   
+  <div id="input-area">
+    <input type="text" id="username" placeholder="Your name" value="Anonymous">
+    <input type="text" id="messageInput" placeholder="Type your message">
+    <button onclick="sendMessage()">Send</button>
+    <input type="file" id="fileInput" multiple>
+    <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">Upload File</button>
+  </div>
 
   <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAawx2muQ8ECQCnCRtSQ6fdRDj0YODYndc",
@@ -37,140 +170,104 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const storage = getStorage(app);
     const messagesRef = ref(db, "chatroom");
 
     const messagesDiv = document.getElementById("messages");
+    const fileInput = document.getElementById("fileInput");
+
+    // Handle file selection
+    fileInput.addEventListener('change', async (e) => {
+      const files = e.target.files;
+      if (files.length > 0) {
+        await uploadFiles(files);
+        fileInput.value = ''; // Reset file input
+      }
+    });
+
+    async function uploadFiles(files) {
+      const user = document.getElementById("username").value || "Anonymous";
+      
+      for (const file of files) {
+        try {
+          // Create a reference to the storage location
+          const fileRef = storageRef(storage, `chat_files/${Date.now()}_${file.name}`);
+          
+          // Upload the file
+          await uploadBytes(fileRef, file);
+          
+          // Get the download URL
+          const downloadURL = await getDownloadURL(fileRef);
+          
+          // Push message with file info
+          push(messagesRef, { 
+            user, 
+            text: "", 
+            file: {
+              name: file.name,
+              url: downloadURL,
+              type: file.type.split('/')[0] // 'image', 'video', 'application', etc.
+            },
+            timestamp: Date.now()
+          });
+        } catch (error) {
+          console.error("Error uploading file:", error);
+        }
+      }
+    }
 
     onChildAdded(messagesRef, (snapshot) => {
       const msg = snapshot.val();
-      console.log("New message:", msg); // Debug
       const el = document.createElement("div");
       el.classList.add("msg");
-      el.innerHTML = `<span>${msg.user}:</span> ${msg.text}`;
+      
+      let fileContent = "";
+      if (msg.file) {
+        if (msg.file.type === 'image') {
+          fileContent = `
+            <div class="file-container">
+              <img src="${msg.file.url}" alt="${msg.file.name}" class="image-preview">
+              <a href="${msg.file.url}" download="${msg.file.name}" class="file-link">
+                <span class="file-icon">📷</span>Download Image
+              </a>
+            </div>
+          `;
+        } else {
+          fileContent = `
+            <div class="file-container">
+              <a href="${msg.file.url}" download="${msg.file.name}" class="file-link">
+                <span class="file-icon">📄</span>Download ${msg.file.name}
+              </a>
+            </div>
+          `;
+        }
+      }
+      
+      el.innerHTML = `
+        <span>${msg.user}:</span> ${msg.text}
+        ${fileContent}
+        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+          ${new Date(msg.timestamp).toLocaleString()}
+        </div>
+      `;
+      
       messagesDiv.appendChild(el);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
 
-    window.sendMessage = function () {
+    async function sendMessage() {
       const user = document.getElementById("username").value || "Anonymous";
       const text = document.getElementById("messageInput").value;
+      
       if (text.trim() !== "") {
-        push(messagesRef, { user, text });
+        push(messagesRef, { 
+          user, 
+          text,
+          timestamp: Date.now()
+        });
         document.getElementById("messageInput").value = "";
       }
-    };
+    }
   </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-  
-    <title>Chat Room</title>
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3828459493548375"
-            crossorigin="anonymous"></script>
-    <style>
-        /* Add your CSS styling here */
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        #chat-container { border: 1px solid #ccc; padding: 20px; margin-top: 20px; }
-        .message { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #eee; }
-        .user-info { font-weight: bold; color: #4285f4; }
-        .file-upload { margin-top: 10px; }
-        img, video { max-width: 300px; margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <!-- Google Login Button -->
-    <div id="google-login"></div>
-    
-    <!-- Chat Container -->
-    <div id="chat-container" style="display: none;">
-        <div id="messages"></div>
-        <input type="text" id="message-input" placeholder="Type your message">
-        <input type="file" id="file-input" multiple>
-        <button onclick="sendMessage()">Send</button>
-    </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
-    <script>
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-
-        // Google Login
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('chat-container').style.display = 'block';
-                loadMessages();
-            } else {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                auth.signInWithPopup(provider);
-            }
-        });
-
-        // Send message function
-        async function sendMessage() {
-            const user = auth.currentUser;
-            const messageInput = document.getElementById('message-input');
-            const fileInput = document.getElementById('file-input');
-            
-            // Upload files
-            const fileUrls = [];
-            for (const file of fileInput.files) {
-                const storageRef = storage.ref(`chat_files/${Date.now()}_${file.name}`);
-                await storageRef.put(file);
-                const url = await storageRef.getDownloadURL();
-                fileUrls.push({ type: file.type.split('/')[0], url });
-            }
-
-            // Save message to Firestore
-            await db.collection('messages').add({
-                text: messageInput.value,
-                files: fileUrls,
-                userId: user.uid,
-                userName: user.displayName,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            messageInput.value = '';
-            fileInput.value = '';
-        }
-
-        // Load messages
-        function loadMessages() {
-            db.collection('messages')
-                .orderBy('timestamp')
-                .onSnapshot(snapshot => {
-                    const messagesDiv = document.getElementById('messages');
-                    messagesDiv.innerHTML = '';
-                    
-                    snapshot.forEach(doc => {
-                        const msg = doc.data();
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = 'message';
-                        
-                        messageDiv.innerHTML = `
-                            <div class="user-info">${msg.userName}</div>
-                            <div>${msg.text}</div>
-                            ${msg.files ? msg.files.map(file => 
-                                file.type === 'image' ? 
-                                `<img src="${file.url}" alt="Image">` :
-                                `<video controls><source src="${file.url}"></video>`
-                            ).join('') : ''}
-                        `;
-                        
-                        messagesDiv.appendChild(messageDiv);
-                    });
-                });
-        }
-    </script>
 </body>
 </html>
