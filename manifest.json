@@ -1,0 +1,43 @@
+{
+  "background_color": "#ffffff",
+  "description": "Play Neon Slide, a free cyberpunk-themed sliding puzzle game. Choose Easy, Medium or Hard, slide tiles into order and beat your best score!",
+  "dir": "auto",
+  "display": "browser",
+  "name": "Neon Slide – Free Online Sliding Puzzle Game",
+  "orientation": "any",
+  "scope": "/https://neonslide.netlify.app/",
+  "short_name": "Neon Slide",
+  "start_url": "/https://neonslide.netlify.app/",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "https://neonslide.netlify.app/logo.png",
+      "type": "image/png",
+      "sizes": "1024x1024",
+      "isSquare": true,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 1024,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    },
+    {
+      "src": "https://neonslide.netlify.app/preview.png",
+      "isSquare": false,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 0,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ],
+  "id": "Sameer9404@",
+  "lang": "en",
+  "categories": [
+    "games"
+  ]
+}
