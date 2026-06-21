@@ -238,6 +238,7 @@
         }
     </style>
 </head>
+    
 <body>
 
     <canvas id="confetti-canvas"></canvas>
@@ -729,5 +730,10 @@ window.addEventListener('resize', () => {
 init();
 
 </script>
+    <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+    </script>
 </body>
 </html>
