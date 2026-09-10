@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Slide | Cyberpunk Tile Puzzle — Sliding Brain Game</title>
+<meta name="google-site-verification" content="bmXIUcydPYcHa5Nb7QPyK-8yzaeneBWj8CzE4dApjXk" />
+    <link rel="canonical" href="https://neonslide.netlify.app/">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/scoring.css">
+    <!-- SEO -->
+    <meta name="title" content="Neon Slide | Cyberpunk Tile Puzzle — Sliding Brain Game">
+    <meta name="description" content="Neon Slide is a free cyberpunk-themed sliding tile puzzle game. Arrange numbered tiles 1 to N by sliding them into the gap. Choose from 5 difficulty levels (3×3 to 10×10), use mouse, touch or arrow keys, and beat your best score. No download, plays instantly in your browser.">
+    <meta name="keywords" content="neon slide, sliding puzzle, cyberpunk puzzle game, tile sliding game, 15 puzzle, brain game, free puzzle game, online puzzle, number puzzle">
+    <meta name="author" content="Neon Slide">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0c0a14">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://neonslide.netlify.app/">
+    <meta property="og:title" content="Neon Slide — Cyberpunk Tile Puzzle Game">
+    <meta property="og:description" content="A free cyberpunk sliding tile puzzle. Arrange tiles 1 to N, choose 5 difficulty levels, beat your best score. Plays instantly — no download required.">
+    <meta property="og:image" content="https://neonslide.netlify.app/logo.png">
+    <meta property="og:site_name" content="Neon Slide">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://neonslide.netlify.app/">
+    <meta name="twitter:title" content="Neon Slide — Cyberpunk Tile Puzzle Game">
+    <meta name="twitter:description" content="A free cyberpunk sliding tile puzzle. Arrange tiles 1 to N, choose 5 difficulty levels, beat your best score. Plays instantly — no download required.">
+    <meta name="twitter:image" content="https://neonslide.netlify.app/logo.png">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Neon Slide",
+        "description": "A free cyberpunk-themed sliding tile puzzle game. Arrange numbered tiles 1 to N by sliding them into the gap. Five difficulty levels from 3×3 to 10×10.",
+        "url": "https://neonslide.netlify.app/",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Web Browser",
+        "browserRequirements": "Requires JavaScript",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+
+    <style>
+        :root {
+            --bg: #0c0a14;
+            --bg-elev: #15121f;
+            --panel: #181423;
+            --border: rgba(201, 169, 110, 0.14);
+            --border-strong: rgba(201, 169, 110, 0.3);
+            --text: #ece8e0;
+            --text-dim: #8b8497;
+            --gold: #c9a96e;
+            --gold-bright: #e0c890;
+            --gold-glow: rgba(201, 169, 110, 0.25);
+            --tile: #1c1729;
+            --tile-hover: #271f38;
+            --tile-correct: rgba(201, 169, 110, 0.08);
+            --rose: #c77b7b;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            --font-serif: Georgia, "Times New Roman", serif;
+            --ease: 0.2s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(circle at 50% 0%, #1a1426 0%, var(--bg) 60%);
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: radial-gradient(ellipse at top, rgba(201,169,110,0.04) 0%, transparent 50%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .container {
+            width: 100%; max-width: 460px;
+            padding: 24px 20px 36px;
+            display: flex; flex-direction: column; gap: 16px;
+            position: relative; z-index: 1;
+        }
+
+        /* --- Header --- */
+        header { text-align: center; }
+        .logo { display: flex; justify-content: center; margin-bottom: 10px; }
+        .logo img { height: 50px; width: auto; opacity: 0.9; }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.9rem, 8vw, 2.6rem);
+            font-weight: 400; letter-spacing: 6px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold) 50%, #a88950);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            color: var(--text-dim); font-size: 0.7rem;
+            letter-spacing: 2px; text-transform: uppercase; font-weight: 500;
+        }
+        .tagline {
+            color: var(--text-dim); font-size: 0.8rem;
+            font-weight: 400; letter-spacing: 0.5px; margin-top: 2px;
+        }
+        .divider {
+            width: 40px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 12px auto 2px;
+        }
+
+        /* --- Top bar: sound + help --- */
+        .top-bar {
+            display: flex; justify-content: flex-end; gap: 8px;
+        }
+        .icon-btn {
+            width: 34px; height: 34px; border-radius: 8px;
+            border: 1px solid var(--border); background: var(--panel);
+            color: var(--text-dim); font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all var(--ease);
+        }
+        .icon-btn:hover { color: var(--gold-bright); border-color: var(--border-strong); }
+        .icon-btn.muted { color: var(--rose); }
+
+        /* --- How to Play --- */
+        .help-panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+            padding: 0 14px; margin-top: -4px;
+        }
+        .help-panel.open {
+            max-height: 300px; padding: 12px 14px; margin-top: 0;
+        }
+        .help-panel h3 {
+            font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--gold);
+            margin-bottom: 6px; font-weight: 600;
+        }
+        .help-panel ul {
+            list-style: none; font-size: 0.82rem;
+            color: var(--text-dim); line-height: 1.7;
+        }
+        .help-panel ul li::before { content: '› '; color: var(--gold); }
+
+        /* --- Stats --- */
+        .stats-bar {
+            display: flex; justify-content: space-between;
+            background: var(--panel); border: 1px solid var(--border);
+            padding: 14px 8px; border-radius: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-item {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; gap: 4px; position: relative;
+        }
+        .stat-item + .stat-item::before {
+            content: ''; position: absolute; left: 0; top: 20%;
+            height: 60%; width: 1px; background: var(--border);
+        }
+        .stat-label {
+            font-size: 0.62rem; color: var(--text-dim);
+            text-transform: uppercase; letter-spacing: 1.8px; font-weight: 500;
+        }
+        .stat-value {
+            font-size: 1.3rem; font-weight: 600;
+            color: var(--gold-bright); letter-spacing: 0.5px;
+        }
+        .stat-value.best { color: var(--rose); }
+
+        /* --- Difficulty pills --- */
+        .difficulty-group {
+            display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+        }
+        .diff-pill {
+            padding: 8px 10px; border-radius: 8px;
+            border: 1px solid var(--border); background: transparent;
+            color: var(--text-dim); font-family: var(--font);
+            font-weight: 500; font-size: 0.68rem; letter-spacing: 0.5px;
+            cursor: pointer; transition: all var(--ease); text-align: center;
+        }
+        .diff-pill:hover { color: var(--text); border-color: var(--border-strong); }
+        .diff-pill.active {
+            color: var(--gold-bright); background: var(--tile-correct);
+            border-color: var(--gold);
+        }
+        #difficulty { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+
+        /* --- Controls --- */
+        .controls { display: flex; gap: 10px; justify-content: center; }
+        button {
+            padding: 11px 22px; border-radius: 10px;
+            border: 1px solid var(--border-strong); background: transparent;
+            color: var(--text); font-family: var(--font);
+            font-weight: 500; font-size: 0.78rem; letter-spacing: 1px;
+            text-transform: uppercase; cursor: pointer;
+            transition: all var(--ease); outline: none;
+        }
+        button:focus-visible { box-shadow: 0 0 0 2px var(--gold-glow); }
+        button.primary {
+            background: linear-gradient(135deg, var(--gold), #a88950);
+            border-color: transparent; color: #1a1408; font-weight: 600;
+        }
+        button.primary:hover { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); transform: translateY(-1px); }
+        button.primary:active { transform: translateY(0); }
+        button.secondary:hover { border-color: var(--gold); color: var(--gold-bright); transform: translateY(-1px); }
+        button.secondary:active { transform: translateY(0); }
+
+        /* --- Board --- */
+        .board-wrapper {
+            position: relative; width: 100%; aspect-ratio: 1;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 16px; padding: 10px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        }
+        .board { display: grid; width: 100%; height: 100%; gap: 6px; }
+        .tile {
+            background: var(--tile); border: 1px solid var(--border);
+            border-radius: 9px; display: flex; align-items: center;
+            justify-content: center;
+            font-weight: 600; color: var(--text);
+            cursor: pointer; position: relative;
+            transition: transform var(--ease), background var(--ease), border-color var(--ease);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .tile:not(.empty):hover { background: var(--tile-hover); border-color: var(--border-strong); }
+        .tile.correct {
+            border-color: var(--gold); color: var(--gold-bright);
+            background: var(--tile-correct);
+        }
+        .tile.empty {
+            background: transparent; border-color: transparent;
+            box-shadow: none; cursor: default; pointer-events: none;
+        }
+        .tile.moving { z-index: 2; }
+        .tile.dragging {
+            z-index: 5; transition: none; cursor: grabbing;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+        .tile:not(.empty) { cursor: grab; touch-action: none; }
+        .tile.dragging:not(.empty) { cursor: grabbing; }
+
+        /* --- Overlay --- */
+        .overlay {
+            position: absolute; inset: 0;
+            background: rgba(12, 10, 20, 0.92);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            border-radius: 16px; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease; z-index: 20;
+            text-align: center; gap: 4px;
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+        .overlay h2 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.6rem, 7vw, 2.2rem);
+            font-weight: 400; letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            margin-bottom: 4px;
+        }
+        .overlay p { color: var(--text-dim); margin-bottom: 14px; font-size: 0.95rem; }
+        .stars { font-size: 2rem; margin-bottom: 6px; color: var(--gold); letter-spacing: 4px; }
+        .overlay-buttons { display: flex; gap: 10px; }
+
+        #confetti-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 100;
+        }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed; bottom: 24px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--panel); border: 1px solid var(--gold);
+            color: var(--text); padding: 10px 20px; border-radius: 10px;
+            font-size: 0.85rem; z-index: 200; opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @media (max-width: 400px) {
+            .container { padding: 16px 14px 28px; gap: 14px; }
+            .tile { border-radius: 6px; }
+            .board { gap: 4px; }
+            .stat-value { font-size: 1.1rem; }
+            button { padding: 10px 16px; font-size: 0.7rem; }
+            h1 { letter-spacing: 4px; }
+            .diff-pill { font-size: 0.62rem; padding: 7px 8px; }
+        }
+        .tile:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+    <div class="toast" id="toast"></div>
+
+    <div class="container">
+        <!-- Top bar: sound + help toggles -->
+        <div class="top-bar">
+            <button class="icon-btn" id="btn-help" title="How to Play" aria-label="How to Play">?</button>
+            <button class="icon-btn" id="btn-sound" title="Toggle Sound" aria-label="Toggle Sound">♪</button>
+        </div>
+
+        <header>
+            <div class="logo"><img src="logo.png" alt="NeonSlide Logo" height="50"></div>
+            <h1>Neon Slide</h1>
+            <div class="subtitle">Cyberpunk Tile Puzzle</div>
+            <div class="divider"></div>
+            <p class="tagline">Slide tiles toward the gap to order them 1 to N</p>
+        </header>
+
+        <!-- How to Play panel -->
+        <div class="help-panel" id="help-panel">
+            <h3>How to Play</h3>
+            <ul>
+                <li>Click or tap a tile next to the empty gap to slide it</li>
+                <li>Drag a tile toward the gap on touch screens</li>
+                <li>Use Arrow keys — the tile slides into the gap</li>
+                <li>Arrange tiles in order 1, 2, 3 ... N with the gap last</li>
+                <li>Correctly placed tiles glow gold</li>
+                <li>Solve in fewer moves to earn more stars</li>
+            </ul>
+        </div>
+
+        <section class="scoring-panel" aria-label="Scoring account">
+            <details id="account-details">
+                <summary id="account-summary">Log in or create a scoring account</summary>
+                <form id="account-form">
+                    <label id="account-username-label">Username<input id="account-username" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required></label>
+                    <label id="account-email-label" hidden>Recovery email<input id="account-email" type="email" autocomplete="email" maxlength="254"></label>
+                    <label id="account-password-label">Password<input id="account-password" type="password" autocomplete="current-password" maxlength="128" required></label>
+                    <button class="primary" id="account-submit">Log in</button>
+                </form>
+                <div class="account-actions" id="account-modes">
+                    <button type="button" data-auth-mode="login">Log in</button>
+                    <button type="button" data-auth-mode="signup">Create account</button>
+                    <button type="button" data-auth-mode="recover">Forgot password</button>
+                </div>
+                <button type="button" id="account-logout" hidden>Log out</button>
+                <p id="account-message" role="status"></p>
+            </details>
+        </section>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Moves</span>
+                <span class="stat-value" id="move-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Time</span>
+                <span class="stat-value" id="timer">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Best</span>
+                <span class="stat-value best" id="best-score">-</span>
+            </div>
+        </div>
+
+        <div class="difficulty-group" role="group" aria-label="Select Difficulty">
+            <button type="button" class="diff-pill" data-size="3">3×3</button>
+            <button type="button" class="diff-pill active" data-size="4">4×4</button>
+            <button type="button" class="diff-pill" data-size="5">5×5</button>
+            <button type="button" class="diff-pill" data-size="6">6×6</button>
+            <button type="button" class="diff-pill" data-size="10">10×10</button>
+        </div>
+        <select id="difficulty" aria-label="Select Difficulty" tabindex="-1">
+            <option value="3">Easy (3×3)</option>
+            <option value="4" selected>Medium (4×4)</option>
+            <option value="5">Hard (5×5)</option>
+            <option value="6">Expert (6×6)</option>
+            <option value="10">Master (10×10)</option>
+        </select>
+
+        <div class="controls">
+            <button class="secondary" id="btn-reset">↺ Reset</button>
+            <button class="primary" id="btn-shuffle">▶ New Game</button>
+        </div>
+
+        <div class="board-wrapper">
+            <div class="board" id="game-board"></div>
+            <div class="overlay" id="victory-overlay">
+                <div class="stars" id="star-rating">★★★</div>
+                <h2>Solved</h2>
+                <p id="final-stats">Moves: 0 | Time: 00:00</p>
+                <div class="overlay-buttons">
+                    <button class="secondary" id="btn-share">↗ Share</button>
+                    <button class="primary" id="btn-play-again">Play Again</button>
+                </div>
+            </div>
+        </div>
+        <section class="scoring-panel" aria-labelledby="leaderboard-heading">
+            <h2 id="leaderboard-heading">Live leaderboard · <span id="leaderboard-size">4×4</span></h2>
+            <p>Fewest moves wins. Ties are ranked by fastest time. Your best completed game counts for each size.</p>
+            <p id="leaderboard-status" role="status">Loading scores…</p>
+            <table><thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Moves</th><th scope="col">Time</th></tr></thead><tbody id="leaderboard-rows"></tbody></table>
+            <p id="score-message" role="status"></p>
+            <button type="button" id="retry-score" hidden>Retry saving score</button>
+        </section>
+    </div>
+
+<script src="/scoring.js"></script>
+<script>
+/**
+ * NEON SLIDE — Cyberpunk Tile Puzzle
+ * Sliding puzzle with 5 difficulty levels, sound, shareable scores.
+ */
+const CONFIG = {
+    difficulties: {
+        3:  { size: 3,  par: 50 },
+        4:  { size: 4,  par: 120 },
+        5:  { size: 5,  par: 250 },
+        6:  { size: 6,  par: 450 },
+        10: { size: 10, par: 1500 }
+    }
+};
+
+let state = {
+    gridSize: 4, tiles: [], emptyIndex: 15,
+    moves: 0, startTime: null, timerInterval: null,
+    isPlaying: false, isWon: false,
+    soundOn: true
+};
+
+const els = {
+    board: document.getElementById('game-board'),
+    moveCount: document.getElementById('move-count'),
+    timer: document.getElementById('timer'),
+    bestScore: document.getElementById('best-score'),
+    difficulty: document.getElementById('difficulty'),
+    btnShuffle: document.getElementById('btn-shuffle'),
+    btnReset: document.getElementById('btn-reset'),
+    overlay: document.getElementById('victory-overlay'),
+    finalStats: document.getElementById('final-stats'),
+    starRating: document.getElementById('star-rating'),
+    btnPlayAgain: document.getElementById('btn-play-again'),
+    btnShare: document.getElementById('btn-share'),
+    btnSound: document.getElementById('btn-sound'),
+    btnHelp: document.getElementById('btn-help'),
+    helpPanel: document.getElementById('help-panel'),
+    confettiCanvas: document.getElementById('confetti-canvas'),
+    toast: document.getElementById('toast')
+};
+
+// --- Sound Engine (Web Audio API, no external files) ---
+let audioCtx = null;
+function getAudio() {
+    if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch(e) { return null; }
+    }
+    return audioCtx;
+}
+function playSlide() {
+    if (!state.soundOn) return;
+    const ctx = getAudio(); if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.1);
+}
+function playWin() {
+    if (!state.soundOn) return;
+    const ctx = getAudio(); if (!ctx) return;
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const t = ctx.currentTime + i * 0.12;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.15, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(t); osc.stop(t + 0.4);
+    });
+}
+
+// --- Toast ---
+let toastTimer = null;
+function showToast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2200);
+}
+
+// --- Init ---
+function init() {
+    loadBestScore();
+    els.btnShuffle.addEventListener('click', startNewGame);
+    els.btnReset.addEventListener('click', resetCurrentGame);
+    els.btnPlayAgain.addEventListener('click', () => {
+        els.overlay.classList.remove('active');
+        startNewGame();
+    });
+    els.difficulty.addEventListener('change', (e) => {
+        state.gridSize = parseInt(e.target.value);
+        syncPills(); startNewGame();
+    });
+    document.querySelectorAll('.diff-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            els.difficulty.value = pill.dataset.size;
+            els.difficulty.dispatchEvent(new Event('change'));
+        });
+    });
+    // Sound toggle
+    els.btnSound.addEventListener('click', () => {
+        state.soundOn = !state.soundOn;
+        els.btnSound.textContent = state.soundOn ? '♪' : '♪̸';
+        els.btnSound.classList.toggle('muted', !state.soundOn);
+        showToast(state.soundOn ? 'Sound on' : 'Sound off');
+    });
+    // Help toggle
+    els.btnHelp.addEventListener('click', () => {
+        els.helpPanel.classList.toggle('open');
+    });
+    // Share
+    els.btnShare.addEventListener('click', shareResult);
+
+    document.addEventListener('keydown', handleKeyboard);
+    startNewGame();
+}
+
+function syncPills() {
+    document.querySelectorAll('.diff-pill').forEach(pill => {
+        pill.classList.toggle('active', parseInt(pill.dataset.size) === state.gridSize);
+    });
+}
+
+// --- Game Logic ---
+async function startNewGame() {
+    const generation = ++gameGeneration;
+    stopTimer(); rankedGame = null; moveHistory = [];
+    state.isPlaying = false; state.isWon = false; state.moves = 0;
+    els.timer.textContent = '00:00'; els.bestScore.textContent = '-';
+    els.overlay.classList.remove('active');
+    updateUI();
+    await scoringReady;
+    if (generation !== gameGeneration) return;
+    const size = state.gridSize;
+    if (scoringUser) {
+        scoreMessage.textContent = 'Starting ranked game…';
+        try {
+            const game = await api('scores', { action:'start', size });
+            if (generation !== gameGeneration) return;
+            rankedGame = game.id; state.tiles = game.board; state.emptyIndex = game.board.indexOf(0);
+            scoreMessage.textContent = 'Ranked game · timing starts when the server creates your puzzle.';
+        } catch (error) {
+            if (generation !== gameGeneration) return;
+            scoreMessage.textContent = error.message + ' Select New Game to retry. This game is guest practice.';
+            generateSolvableBoard();
+        }
+    } else {
+        generateSolvableBoard(); scoreMessage.textContent = 'Guest practice · log in and start a new game to save scores.';
+    }
+    state.isPlaying = true; renderBoard(); startTimer(); refreshLeaderboard();
+}
+
+function resetCurrentGame() {
+    ++gameGeneration; rankedGame = null; moveHistory = [];
+    stopTimer();
+    state.tiles = Array.from({length: state.gridSize * state.gridSize}, (_, i) => (i + 1) % (state.gridSize * state.gridSize));
+    state.emptyIndex = state.tiles.indexOf(0);
+    state.moves = 0; state.isPlaying = false;
+    updateUI(); renderBoard();
+}
+
+function generateSolvableBoard() {
+    const n = state.gridSize * state.gridSize;
+    let tiles;
+    do {
+        tiles = Array.from({length: n}, (_, i) => (i + 1) % n);
+        for (let i = tiles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+        }
+    } while (!isSolvable(tiles) || isSolved(tiles));
+    state.tiles = tiles;
+    state.emptyIndex = tiles.indexOf(0);
+}
+
+function isSolvable(tiles) {
+    const size = state.gridSize;
+    let inversions = 0;
+    for (let i = 0; i < tiles.length; i++) {
+        if (tiles[i] === 0) continue;
+        for (let j = i + 1; j < tiles.length; j++) {
+            if (tiles[j] !== 0 && tiles[i] > tiles[j]) inversions++;
+        }
+    }
+    if (size % 2 !== 0) {
+        return inversions % 2 === 0;
+    } else {
+        const blankIdx = tiles.indexOf(0);
+        const rowFromBottom = size - Math.floor(blankIdx / size);
+        return (inversions + rowFromBottom) % 2 !== 0;
+    }
+}
+
+function handleTileClick(index) {
+    if (!state.isPlaying || state.isWon) return;
+    if (isValidMove(index)) {
+        moveHistory.push(index);
+        swapTiles(index);
+        state.moves++;
+        playSlide();
+        updateUI();
+        checkWinCondition();
+    }
+}
+
+function isValidMove(index) {
+    const size = state.gridSize;
+    const empty = state.emptyIndex;
+    const rowDiff = Math.abs(Math.floor(index / size) - Math.floor(empty / size));
+    const colDiff = Math.abs((index % size) - (empty % size));
+    return (rowDiff + colDiff) === 1;
+}
+
+function swapTiles(index) {
+    [state.tiles[index], state.tiles[state.emptyIndex]] = [state.tiles[state.emptyIndex], state.tiles[index]];
+    state.emptyIndex = index;
+    renderBoard();
+}
+
+function checkWinCondition() {
+    if (isSolved(state.tiles)) {
+        state.isWon = true; state.isPlaying = false;
+        stopTimer(); saveBestScore();
+        playWin();
+        showVictory();
+    }
+}
+
+function isSolved(tiles) {
+    for (let i = 0; i < tiles.length - 1; i++) {
+        if (tiles[i] !== i + 1) return false;
+    }
+    return tiles[tiles.length - 1] === 0;
+}
+
+// --- Rendering ---
+function renderBoard() {
+    els.board.style.gridTemplateColumns = `repeat(${state.gridSize}, 1fr)`;
+    // Dynamic font size based on grid
+    const fontSize = state.gridSize >= 10 ? '0.9rem' : state.gridSize >= 6 ? '1.1rem' : 'clamp(1.1rem, 6vw, 1.65rem)';
+    els.board.innerHTML = '';
+    state.tiles.forEach((val, idx) => {
+        const tile = document.createElement('div');
+        tile.className = `tile ${val === 0 ? 'empty' : ''}`;
+        tile.style.fontSize = fontSize;
+        if (val !== 0 && val === idx + 1) tile.classList.add('correct');
+        if (val !== 0) {
+            tile.textContent = val;
+            tile.setAttribute('role', 'button');
+            tile.setAttribute('aria-label', `Tile ${val}`);
+            tile.tabIndex = 0;
+            tile.dataset.index = idx;
+            tile.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') handleTileClick(idx); };
+            attachDragHandlers(tile, idx);
+        }
+        els.board.appendChild(tile);
+    });
+}
+
+function attachDragHandlers(tile, idx) {
+    let dragState = null;
+    const onPointerDown = (e) => {
+        if (!state.isPlaying || state.isWon) return;
+        if (!isValidMove(idx)) return;
+        const size = state.gridSize;
+        const empty = state.emptyIndex;
+        const rowDiff = Math.floor(empty / size) - Math.floor(idx / size);
+        const colDiff = (empty % size) - (idx % size);
+        const rect = tile.getBoundingClientRect();
+        dragState = {
+            startX: e.clientX, startY: e.clientY,
+            dirX: colDiff, dirY: rowDiff,
+            tileWidth: rect.width, tileHeight: rect.height,
+            committed: false
+        };
+        tile.classList.add('dragging');
+        tile.setPointerCapture(e.pointerId);
+        e.preventDefault();
+    };
+    const onPointerMove = (e) => {
+        if (!dragState) return;
+        const dx = e.clientX - dragState.startX;
+        const dy = e.clientY - dragState.startY;
+        let moveX = 0, moveY = 0;
+        if (dragState.dirX !== 0) {
+            moveX = dragState.dirX > 0 ? Math.max(0, Math.min(dx, dragState.tileWidth)) : Math.min(0, Math.max(dx, -dragState.tileWidth));
+        } else if (dragState.dirY !== 0) {
+            moveY = dragState.dirY > 0 ? Math.max(0, Math.min(dy, dragState.tileHeight)) : Math.min(0, Math.max(dy, -dragState.tileHeight));
+        }
+        tile.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        const threshold = 0.35;
+        const progress = dragState.dirX !== 0
+            ? Math.abs(moveX) / dragState.tileWidth
+            : Math.abs(moveY) / dragState.tileHeight;
+        if (progress >= threshold && !dragState.committed) dragState.committed = true;
+        else if (progress < threshold && dragState.committed) dragState.committed = false;
+    };
+    const onPointerUp = (e) => {
+        if (!dragState) return;
+        const committed = dragState.committed;
+        tile.classList.remove('dragging');
+        tile.style.transform = '';
+        dragState = null;
+        if (committed) handleTileClick(idx);
+    };
+    tile.addEventListener('pointerdown', onPointerDown);
+    tile.addEventListener('pointermove', onPointerMove);
+    tile.addEventListener('pointerup', onPointerUp);
+    tile.addEventListener('pointercancel', onPointerUp);
+}
+
+function updateUI() {
+    els.moveCount.textContent = state.moves;
+    els.difficulty.value = state.gridSize;
+    syncPills();
+}
+
+// --- Timer ---
+function startTimer() {
+    state.startTime = Date.now();
+    state.timerInterval = setInterval(() => {
+        const delta = Math.floor((Date.now() - state.startTime) / 1000);
+        const m = String(Math.floor(delta / 60)).padStart(2, '0');
+        const s = String(delta % 60).padStart(2, '0');
+        els.timer.textContent = `${m}:${s}`;
+    }, 1000);
+}
+function stopTimer() { clearInterval(state.timerInterval); }
+
+// --- Keyboard ---
+function handleKeyboard(e) {
+    if (e.target.closest('input, textarea, select, form')) return;
+    if (!state.isPlaying || state.isWon) return;
+    const size = state.gridSize;
+    const emptyRow = Math.floor(state.emptyIndex / size);
+    const emptyCol = state.emptyIndex % size;
+    let targetIndex = -1;
+    switch(e.key) {
+        case 'ArrowUp':    if (emptyRow < size - 1) targetIndex = state.emptyIndex + size; break;
+        case 'ArrowDown':  if (emptyRow > 0) targetIndex = state.emptyIndex - size; break;
+        case 'ArrowLeft':  if (emptyCol < size - 1) targetIndex = state.emptyIndex + 1; break;
+        case 'ArrowRight': if (emptyCol > 0) targetIndex = state.emptyIndex - 1; break;
+    }
+    if (targetIndex >= 0 && targetIndex < state.tiles.length) {
+        e.preventDefault();
+        handleTileClick(targetIndex);
+    }
+}
+
+// --- Scoring ---
+function saveBestScore() { submitRankedScore(); }
+function loadBestScore() { els.bestScore.textContent = '-'; }
+
+// --- Victory + Share ---
+function showVictory() {
+    const par = CONFIG.difficulties[state.gridSize].par;
+    let stars = '★';
+    if (state.moves <= par) stars = '★★★';
+    else if (state.moves <= par * 1.5) stars = '★★';
+    els.starRating.textContent = stars;
+    els.finalStats.textContent = `Moves: ${state.moves} | Time: ${els.timer.textContent}`;
+    els.overlay.classList.add('active');
+    fireConfetti();
+}
+
+function getShareText() {
+    const stars = els.starRating.textContent;
+    const diffLabel = els.difficulty.options[els.difficulty.selectedIndex].text;
+    return `Neon Slide — ${diffLabel}\n${stars}\nSolved in ${state.moves} moves | ${els.timer.textContent}\nPlay: https://neonslide.netlify.app`;
+}
+
+function shareResult() {
+    const text = getShareText();
+    if (navigator.share) {
+        navigator.share({ title: 'Neon Slide', text: text, url: 'https://neonslide.netlify.app' })
+            .catch(() => {});
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Score copied to clipboard!');
+        }).catch(() => {
+            showToast(text);
+        });
+    } else {
+        showToast(text);
+    }
+}
+
+// --- Confetti ---
+function fireConfetti() {
+    const canvas = els.confettiCanvas;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const particles = [];
+    const colors = ['#c9a96e', '#e0c890', '#c77b7b', '#ece8e0', '#a88950'];
+    for (let i = 0; i < 120; i++) {
+        particles.push({
+            x: canvas.width / 2, y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15 - 5,
+            size: Math.random() * 8 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            life: 100, decay: Math.random() * 0.5 + 0.5
+        });
+    }
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        particles.forEach(p => {
+            if (p.life <= 0) return;
+            active = true;
+            p.x += p.vx; p.y += p.vy; p.vy += 0.3;
+            p.life -= p.decay;
+            ctx.globalAlpha = p.life / 100;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+        if (active) requestAnimationFrame(animate);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    animate();
+}
+
+window.addEventListener('resize', () => {
+    els.confettiCanvas.width = window.innerWidth;
+    els.confettiCanvas.height = window.innerHeight;
+});
+
+init();
+</script>
+    <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+    </script>
+</body>
+</html>
