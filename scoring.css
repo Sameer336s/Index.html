@@ -1,0 +1,16 @@
+.scoring-panel { padding:18px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
+.scoring-panel h2 { font:400 1.3rem var(--font-serif); color:var(--gold); margin-bottom:10px; }
+.scoring-panel p, .scoring-panel summary { font-size:.8rem; line-height:1.6; }
+.scoring-panel summary { cursor:pointer; }
+.scoring-panel form { display:grid; gap:12px; margin-top:14px; }
+.scoring-panel label { display:grid; gap:6px; font-size:.78rem; }
+.scoring-panel input { width:100%; padding:11px; background:var(--bg); color:var(--text); border:1px solid var(--border-strong); border-radius:6px; font:inherit; user-select:text; }
+.scoring-panel :focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+.scoring-panel button { letter-spacing:0; }
+.scoring-panel .account-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.scoring-panel table { border-collapse:collapse; width:100%; font-size:.78rem; margin-top:12px; font-variant-numeric:tabular-nums; }
+.scoring-panel th, .scoring-panel td { text-align:left; padding:9px 4px; border-bottom:1px solid var(--border); overflow-wrap:anywhere; }
+.scoring-panel th { color:var(--text-dim); font-weight:500; }
+.scoring-panel [hidden] { display:none !important; }
+#account-message, #score-message { margin-top:10px; }
+button:disabled { opacity:.55; cursor:wait; }
