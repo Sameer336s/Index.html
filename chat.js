@@ -10,6 +10,7 @@
 
     var ENDPOINT = 'https://vhbeqieootftdlyostjd.supabase.co/functions/v1/sarvam-chat';
     var STORAGE_KEY = 'neonslide_chat_v1';
+    var SESSION_KEY = 'neonslide_session_v1';
     var WELCOME = 'Hey! I\'m NeonBot, your Neon Slide companion — powered by Sarvam AI. Ask me how to play, request strategy tips, or chat in any language you like.';
     var MAX_STORED = 24;   // messages kept in localStorage
     var MAX_SENT = 12;     // messages sent to the model
@@ -37,7 +38,7 @@
         '.chat-head-title{font-size:.85rem;font-weight:600;letter-spacing:.5px;color:var(--text,#ece8e0)}',
         '.chat-head-sub{font-size:.6rem;color:var(--text-dim,#8b8497);letter-spacing:1px;text-transform:uppercase;',
         'display:flex;align-items:center;gap:5px;margin-top:2px}',
-        '.chat-head-sub::before{content:\'\';width:6px;height:6px;border-radius:50%;background:#7bb881;',
+        '.chat-head-sub::before{content:\'\'';width:6px;height:6px;border-radius:50%;background:#7bb881;',
         'box-shadow:0 0 6px #7bb881;flex:none}',
         '.chat-head-actions{display:flex;gap:6px}',
         '.chat-head-actions button{width:28px;height:28px;padding:0;border-radius:7px;font-size:.8rem;',
@@ -70,6 +71,8 @@
         '.chat-input-row input:focus-visible{outline:2px solid var(--gold,#c9a96e);outline-offset:1px}',
         '.chat-send{width:42px;padding:0;border-radius:9px;flex:none;',
         'background:linear-gradient(135deg,var(--gold,#c9a96e),#a88950);border:none;color:#1a1408;font-weight:600;font-size:.9rem}',
+        '.chat-tools{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}',
+        '.chat-tool-badge{font-size:.58rem;color:var(--gold);background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);padding:2px 6px;border-radius:999px;letter-spacing:.3px;text-transform:uppercase}',
         '@media (max-width:480px){.chat-panel{right:14px;bottom:78px;max-height:calc(100vh - 100px)}.chat-fab{right:14px;bottom:14px}}'
     ].join('');
 
@@ -147,6 +150,17 @@
     }
     function saveHistory() {
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(-MAX_STORED))); } catch (e) { /* storage full */ }
+    }
+
+    function getSessionId() {
+        try {
+            var sid = localStorage.getItem(SESSION_KEY);
+            if (!sid) {
+                sid = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+                localStorage.setItem(SESSION_KEY, sid);
+            }
+            return sid;
+        } catch (e) { return null; }
     }
 
     // ── Rendering ──
@@ -234,7 +248,8 @@
             messages: history.slice(-MAX_SENT).map(function (m) {
                 return { role: m.role === 'user' ? 'user' : 'assistant', content: m.content };
             }),
-            game_context: buildGameContext()
+            game_context: buildGameContext(),
+            session_id: getSessionId()
         };
 
         fetch(ENDPOINT, {
@@ -252,6 +267,18 @@
                     var reply = r.data.reply.trim();
                     history.push({ role: 'bot', content: reply });
                     renderMessage({ role: 'bot', content: reply }, true);
+                    if (r.data.tools_used && r.data.tools_used.length) {
+                        var lastMsg = els.messages.lastElementChild;
+                        if (lastMsg) {
+                            var tools = el('div', 'chat-tools');
+                            r.data.tools_used.forEach(function(t) {
+                                var badge = el('span', 'chat-tool-badge');
+                                badge.textContent = '⚡ ' + t.label;
+                                tools.appendChild(badge);
+                            });
+                            lastMsg.appendChild(tools);
+                        }
+                    }
                 } else {
                     var err = (r.data && r.data.error) ? r.data.error : 'NeonBot is unreachable right now. Please try again.';
                     renderMessage({ role: 'error', content: err }, true);
