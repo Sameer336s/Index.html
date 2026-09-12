@@ -1,6 +1,6 @@
 /**
  * NEON SLIDE — NeonBot, the in-game AI companion.
- * Powered by Sarvam AI through a Supabase Edge Function
+ * Powered by Sarvam AI through a Netlify Function (MCP-style tool calling)
  * (the API key stays server-side and is never exposed to the browser).
  *
  * Self-contained: injects its own styles + widget markup, then wires it up.
@@ -8,7 +8,7 @@
 (function () {
     'use strict';
 
-    var ENDPOINT = 'https://vhbeqieootftdlyostjd.supabase.co/functions/v1/sarvam-chat';
+    var ENDPOINT = '/api/chat';
     var STORAGE_KEY = 'neonslide_chat_v1';
     var SESSION_KEY = 'neonslide_session_v1';
     var WELCOME = 'Hey! I\'m NeonBot, your Neon Slide companion — powered by Sarvam AI. Ask me how to play, request strategy tips, or chat in any language you like.';
