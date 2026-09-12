@@ -99,6 +99,7 @@ function sanitizeMessages(input) {
     out.push({ role, content });
     if (out.length >= MAX_MESSAGES) break;
   }
+  // ensure conversation starts with a user turn
   while (out.length && out[0].role !== 'user') out.shift();
   return out;
 }
@@ -191,10 +192,13 @@ exports.handler = async (event) => {
       if (Date.now() >= deadline) break;
       const data = await callSarvam(convo, apiKey, deadline);
       const choice = data && data.choices && data.choices[0];
-      if (!choice || !choice.message) break;
+      if (!choice || !choice.message) {
+        break;
+      }
       const msg = choice.message;
 
       if (Array.isArray(msg.tool_calls) && msg.tool_calls.length) {
+        // append the assistant turn that requested tools
         convo.push({ role: 'assistant', tool_calls: msg.tool_calls });
         for (const call of msg.tool_calls) {
           const toolName = call && call.function && call.function.name;
@@ -220,6 +224,7 @@ exports.handler = async (event) => {
         continue;
       }
 
+      // final answer
       lastReply = typeof msg.content === 'string' ? msg.content.trim() : '';
       if (lastReply) {
         return json(200, { reply: lastReply, tools_used: toolsUsed });
