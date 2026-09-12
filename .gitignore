@@ -1,0 +1,13 @@
+# Node
+node_modules/
+
+# Netlify
+.netlify/
+
+# Env files — never commit keys
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
