@@ -1,14 +1,16 @@
 /**
  * NEON SLIDE — NeonBot, the in-game AI companion.
- * Powered by Sarvam AI through a Netlify Function (MCP-style tool calling)
- * (the API key stays server-side and is never exposed to the browser).
+ * Powered by Sarvam AI through a Netlify Function (/api/sarvam-chat)
+ * with MCP-style tool calling (game help, strategy, board analysis,
+ * player stats, leaderboard). The API key stays server-side in a
+ * Netlify environment variable and is never exposed to the browser.
  *
  * Self-contained: injects its own styles + widget markup, then wires it up.
  */
 (function () {
     'use strict';
 
-    var ENDPOINT = '/api/chat';
+    var ENDPOINT = '/api/sarvam-chat';
     var STORAGE_KEY = 'neonslide_chat_v1';
     var SESSION_KEY = 'neonslide_session_v1';
     var WELCOME = 'Hey! I\'m NeonBot, your Neon Slide companion — powered by Sarvam AI. Ask me how to play, request strategy tips, or chat in any language you like.';
@@ -219,6 +221,11 @@
                     }
                     ctx.solvedTiles = solved;
                     ctx.totalTiles = state.tiles.length - 1;
+                    // Send the live board so NeonBot's BOARD ANALYSIS tool can inspect it.
+                    ctx.tiles = state.tiles.slice(0, 100).map(function (v) {
+                        var n = parseInt(v, 10);
+                        return (typeof n === 'number' && isFinite(n) && n >= 0) ? n : 0;
+                    });
                 }
             }
         } catch (e) { /* game state unavailable */ }
