@@ -1,16 +1,15 @@
-.scoring-panel { padding:18px; border:1px solid var(--border); border-radius:12px; background:var(--panel); }
-.scoring-panel h2 { font:400 1.3rem var(--font-serif); color:var(--gold); margin-bottom:10px; }
-.scoring-panel p, .scoring-panel summary { font-size:.8rem; line-height:1.6; }
-.scoring-panel summary { cursor:pointer; }
-.scoring-panel form { display:grid; gap:12px; margin-top:14px; }
-.scoring-panel label { display:grid; gap:6px; font-size:.78rem; }
-.scoring-panel input { width:100%; padding:11px; background:var(--bg); color:var(--text); border:1px solid var(--border-strong); border-radius:6px; font:inherit; user-select:text; }
-.scoring-panel :focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
-.scoring-panel button { letter-spacing:0; }
-.scoring-panel .account-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
-.scoring-panel table { border-collapse:collapse; width:100%; font-size:.78rem; margin-top:12px; font-variant-numeric:tabular-nums; }
-.scoring-panel th, .scoring-panel td { text-align:left; padding:9px 4px; border-bottom:1px solid var(--border); overflow-wrap:anywhere; }
-.scoring-panel th { color:var(--text-dim); font-weight:500; }
-.scoring-panel [hidden] { display:none !important; }
-#account-message, #score-message { margin-top:10px; }
-button:disabled { opacity:.55; cursor:wait; }
+.scoring-panel{padding:18px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(145deg,rgba(24,20,35,.92),rgba(13,11,22,.9));box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(18px)}
+.scoring-panel h2{font:400 1.3rem var(--font-serif);color:var(--gold-bright);margin-bottom:10px;letter-spacing:.3px}
+.scoring-panel p,.scoring-panel summary{font-size:.8rem;line-height:1.6}.scoring-panel summary{cursor:pointer;color:var(--gold-bright)}
+.scoring-panel form{display:grid;gap:12px;margin-top:14px}.scoring-panel label{display:grid;gap:6px;font-size:.78rem;color:var(--text-dim)}
+.scoring-panel input{width:100%;padding:12px 13px;background:rgba(12,10,20,.72);color:var(--text);border:1px solid var(--border-strong);border-radius:10px;font:inherit;user-select:text;transition:border-color .2s ease,box-shadow .2s ease}
+.scoring-panel input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,169,110,.08),0 0 24px rgba(201,169,110,.08);outline:none}
+.scoring-panel :focus-visible{outline:2px solid var(--gold);outline-offset:3px}.scoring-panel button{letter-spacing:0}.scoring-panel .account-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.scoring-panel table{border-collapse:separate;border-spacing:0;width:100%;font-size:.78rem;margin-top:12px;font-variant-numeric:tabular-nums;overflow:hidden;border:1px solid var(--border);border-radius:12px}
+.scoring-panel th,.scoring-panel td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--border);overflow-wrap:anywhere}.scoring-panel tr:last-child td{border-bottom:0}.scoring-panel th{color:var(--gold);font-weight:600;background:rgba(201,169,110,.035)}
+.scoring-panel [hidden]{display:none!important}#account-message,#score-message{margin-top:10px;color:var(--gold-bright)}button:disabled{opacity:.55;cursor:wait}
+body{background-image:radial-gradient(circle at 50% -8%,rgba(201,169,110,.13),transparent 34%),radial-gradient(circle at 10% 80%,rgba(117,85,155,.1),transparent 30%),radial-gradient(circle at 90% 60%,rgba(199,123,123,.07),transparent 28%),linear-gradient(180deg,#0c0a14 0%,#090811 100%)}
+.container{max-width:520px}.logo img{filter:drop-shadow(0 8px 26px rgba(201,169,110,.2))}.board-wrapper{background:linear-gradient(145deg,rgba(30,25,43,.96),rgba(15,12,24,.98));box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 60px rgba(201,169,110,.035),inset 0 1px 0 rgba(255,255,255,.035)}
+.tile{background:linear-gradient(145deg,rgba(35,29,48,.98),rgba(24,19,36,.98))}.tile:not(.empty):hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.3)}.stats-bar{background:linear-gradient(145deg,rgba(28,23,40,.92),rgba(17,14,27,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 12px 30px rgba(0,0,0,.2);backdrop-filter:blur(16px)}
+.diff-pill{background:rgba(255,255,255,.015)}.diff-pill.active{box-shadow:0 0 22px rgba(201,169,110,.08),inset 0 0 20px rgba(201,169,110,.035)}button.primary{box-shadow:0 8px 24px rgba(201,169,110,.16)}button.secondary{background:rgba(255,255,255,.015)}
+@media(max-width:520px){.container{padding-left:14px;padding-right:14px}.board-wrapper{border-radius:18px}}
