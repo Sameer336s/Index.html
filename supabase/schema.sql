@@ -289,3 +289,23 @@ to anon, authenticated;
 --   SUPABASE_URL, SUPABASE_ANON_KEY, JWT_SECRET, SARVAM_API_KEY
 -- then trigger a new deploy.
 -- ═══════════════════════════════════════════════════════════════════════
+
+
+-- Defense-in-depth: application access is through the RPC API, not direct table access.
+revoke all on table
+  public.neonslide_users,
+  public.neonslide_reset_tokens,
+  public.neonslide_games,
+  public.neonslide_scores
+from anon, authenticated;
+
+revoke execute on function public.neonslide_signup(text,text,text) from authenticated;
+revoke execute on function public.neonslide_login(text,text) from authenticated;
+revoke execute on function public.neonslide_recover_by_email(text) from authenticated;
+revoke execute on function public.neonslide_reset_password(text,text) from authenticated;
+revoke execute on function public.neonslide_create_game(uuid,int,jsonb) from authenticated;
+revoke execute on function public.neonslide_get_game(uuid) from authenticated;
+revoke execute on function public.neonslide_get_game_time(uuid) from authenticated;
+revoke execute on function public.neonslide_finish_game(uuid,uuid,int,bigint) from authenticated;
+revoke execute on function public.neonslide_get_leaderboard(int) from authenticated;
+revoke execute on function public.neonslide_get_best(uuid,int) from authenticated;
