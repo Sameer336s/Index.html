@@ -5,9 +5,8 @@
 const crypto = require('crypto');
 
 // ── Supabase config (publishable / anon key — safe for client-side) ──
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://vhbeqieootftdlyostjd.supabase.co';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoYmVxaWVvb3RmdGRseW9zdGpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTYzNjIsImV4cCI6MjEwNDYzMjM2Mn0.vJErE7Jt9g3STODTLxiJ5O-e7QpT9ut2nyPI-IaLTD8';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'neonslide-secret-key-2026-change-me';
 const COOKIE_NAME = 'neonslide_session';
