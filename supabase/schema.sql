@@ -175,7 +175,7 @@ $$;
 create or replace function public.neonslide_get_game(p_game_id uuid)
 returns jsonb
 language plpgsql security definer set search_path = public
-as $
+as $neon$
 declare v_board jsonb; v_size int; v_completed timestamptz;
 begin
     select board, size, completed_at into v_board, v_size, v_completed
@@ -188,7 +188,7 @@ begin
     end if;
     return jsonb_build_object('board', v_board, 'size', v_size, 'completed', false);
 end;
-$;
+$neon$;
 
 create or replace function public.neonslide_get_game_time(p_game_id uuid)
 returns jsonb
