@@ -175,17 +175,20 @@ $$;
 create or replace function public.neonslide_get_game(p_game_id uuid)
 returns jsonb
 language plpgsql security definer set search_path = public
-as $$
-declare v_board jsonb; v_size int;
+as $
+declare v_board jsonb; v_size int; v_completed timestamptz;
 begin
-    select board, size into v_board, v_size
+    select board, size, completed_at into v_board, v_size, v_completed
     from public.neonslide_games
-    where id = p_game_id and completed_at is null
+    where id = p_game_id
     limit 1;
     if v_board is null then return null; end if;
-    return jsonb_build_object('board', v_board, 'size', v_size);
+    if v_completed is not null then
+        return jsonb_build_object('completed', true);
+    end if;
+    return jsonb_build_object('board', v_board, 'size', v_size, 'completed', false);
 end;
-$$;
+$;
 
 create or replace function public.neonslide_get_game_time(p_game_id uuid)
 returns jsonb
@@ -212,9 +215,16 @@ declare v_game record;
 begin
     select * into v_game
     from public.neonslide_games
-    where id = p_game_id and user_id = p_user_id and completed_at is null
+    where id = p_game_id and user_id = p_user_id
     limit 1;
     if v_game is null then return false; end if;
+    -- Idempotent retry: a completed game with an existing score is already saved.
+    if v_game.completed_at is not null then
+        return exists (
+            select 1 from public.neonslide_scores
+            where game_id = p_game_id and user_id = p_user_id
+        );
+    end if;
     if p_moves is null or p_moves < 1 or p_moves > 100000 then return false; end if;
     if p_elapsed_ms is null or p_elapsed_ms < 0 or p_elapsed_ms > 86400000 then return false; end if;
 
