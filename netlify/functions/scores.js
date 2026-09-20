@@ -139,8 +139,13 @@ exports.handler = async (event) => {
 
     // Load the game
     const game = await rpc('neonslide_get_game', { p_game_id: gameId });
+    // Idempotent retry: if the first save committed but the browser lost
+    // its response, Retry must report success instead of failing.
+    if (game && game.completed === true) {
+      return json(200, { message: 'Score was already saved.' });
+    }
     if (!game || !game.board) {
-      return json(404, { error: 'Game not found or already completed.' });
+      return json(404, { error: 'Game not found.' });
     }
 
     // Parse board from JSONB
